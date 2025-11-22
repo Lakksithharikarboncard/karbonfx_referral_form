@@ -131,7 +131,7 @@ const Step2Business: React.FC<StepProps> = ({ onNext, onBack }) => {
               hideError
             />
             <TextField 
-              label="Estimated Annual Transaction Value (USD)" 
+              label="Estimated Transaction Volume (USD)" 
               name="transactionValue" 
               type="number" 
               placeholder="500"

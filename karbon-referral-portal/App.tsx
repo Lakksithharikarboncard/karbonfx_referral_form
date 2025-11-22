@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReferralFormData, referralSchema, defaultValues } from './types';
-import { submitReferral } from './services/mockApi';
+import { submitReferral } from './services/airtableApi';
 import Stepper from './components/Stepper';
 import Step1Referrer from './components/Step1Referrer';
 import Step2Business from './components/Step2Business';
