@@ -8,7 +8,7 @@ import Step1Referrer from './components/Step1Referrer';
 import Step2Business from './components/Step2Business';
 import Step3Terms from './components/Step3Terms';
 import Step4Thanks from './components/Step4Thanks';
-import { trackClarityEvent, setClarityTag, ClarityEvents } from '/workspaces/karbonfx_referral_form/karbon-referral-portal/src/utils/clarity.ts';
+import { trackClarityEvent, setClarityTag, ClarityEvents } from './utils/clarity';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(1);

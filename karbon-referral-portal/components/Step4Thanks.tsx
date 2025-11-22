@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ReferralFormData } from '../types';
 import { CheckCircle, ExternalLink } from 'lucide-react';
-import { trackClarityEvent, identifyClarityUser, setClarityTag, ClarityEvents } from '../src/utils/clarity.ts';
+import { trackClarityEvent, identifyClarityUser, setClarityTag, ClarityEvents } from '../utils/clarity.ts';
 
 interface Step4ThanksProps {
   data: ReferralFormData;
