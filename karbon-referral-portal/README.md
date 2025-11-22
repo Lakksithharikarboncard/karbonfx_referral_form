@@ -1,9 +1,16 @@
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:**
 
+*   Node.js
 
-1. Install dependencies:
-   `npm install`
-2. Run the app:
-   `npm run dev`
+**Installation and Setup:**
+
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Run the app:**
+    ```bash
+    npm run dev
+    ```
