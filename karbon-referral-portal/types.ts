@@ -20,35 +20,53 @@ export enum NotificationStatus {
   NO = 'No'
 }
 
-// Regex patterns
-const PHONE_REGEX = /^\+?[1-9]\d{1,14}$/; // Basic E.164-ish check
+// Regex patterns - Updated for 10-digit Indian phone numbers (without +91)
+const PHONE_REGEX = /^[6-9]\d{9}$/; // 10 digits starting with 6-9
 
-// Zod Schema
+// Zod Schema with concise error messages
 export const referralSchema = z.object({
   // Step 1: Referrer Details
-  referrerName: z.string().min(2, "Name must be at least 2 characters").max(100),
-  referrerEmail: z.string().email("Invalid email format"),
-  referrerPhone: z.string().regex(PHONE_REGEX, "Please enter a valid phone number (e.g., +15551234567)"),
-  referrerCompany: z.string().min(2, "Company name must be at least 2 characters").max(150),
+  referrerName: z.string().min(2, "Name is required").max(100),
+  referrerEmail: z.string().email("Invalid email"),
+  referrerPhone: z.string().regex(PHONE_REGEX, "Invalid phone number"),
+  referrerCompany: z.string().min(2, "Company name is required").max(150),
 
   // Step 2: Referred Business Details
-  referredCompanyName: z.string().min(2, "Company name must be at least 2 characters").max(150),
-  referredContactName: z.string().min(2, "Contact name must be at least 2 characters").max(100),
-  referredEmail: z.string().email("Invalid email format"),
-  referredPhone: z.string().regex(PHONE_REGEX, "Please enter a valid phone number"),
-  transactionValue: z.number({ invalid_type_error: "Must be a number" }).positive("Must be a positive value"),
-  notificationStatus: z.nativeEnum(NotificationStatus, { errorMap: () => ({ message: "Please select an option" }) }),
-  discoverySource: z.nativeEnum(DiscoverySource, { errorMap: () => ({ message: "Please select an option" }) }),
-  onboardingTimeline: z.nativeEnum(OnboardingTimeline, { errorMap: () => ({ message: "Please select an option" }) }),
+  referredCompanyName: z.string().min(2, "Company name is required").max(150),
+  referredContactName: z.string().min(2, "Contact name is required").max(100),
+  referredEmail: z.string().email("Invalid email"),
+  referredPhone: z.string().regex(PHONE_REGEX, "Invalid phone number"),
+  transactionValue: z.string()
+    .min(1, "Transaction value is required")
+    .transform((val) => parseFloat(val))
+    .refine((val) => !isNaN(val) && val >= 500, "Minimum value is $500")
+    .refine((val) => !isNaN(val) && val <= 100000, "Maximum value is $100,000"),
+  notificationStatus: z.nativeEnum(NotificationStatus, {
+    errorMap: () => ({ message: "Please select an option" })
+  }),
+  discoverySource: z.nativeEnum(DiscoverySource, {
+    errorMap: () => ({ message: "Please select an option" })
+  }),
+  onboardingTimeline: z.nativeEnum(OnboardingTimeline, {
+    errorMap: () => ({ message: "Please select an option" })
+  }),
 
   // Step 3: Terms
-  acceptedTerms: z.boolean().refine(val => val === true, "You must accept the terms and conditions"),
+  acceptedTerms: z.boolean().refine(val => val === true, "You must accept the terms"),
 });
 
 export type ReferralFormData = z.infer<typeof referralSchema>;
 
 export const defaultValues: Partial<ReferralFormData> = {
-  transactionValue: undefined,
+  referrerName: '',
+  referrerEmail: '',
+  referrerPhone: '',
+  referrerCompany: '',
+  referredCompanyName: '',
+  referredContactName: '',
+  referredEmail: '',
+  referredPhone: '',
+  transactionValue: '' as any,
   acceptedTerms: false,
   notificationStatus: undefined,
   discoverySource: undefined,

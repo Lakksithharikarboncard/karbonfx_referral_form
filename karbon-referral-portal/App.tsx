@@ -8,13 +8,20 @@ import Step1Referrer from './components/Step1Referrer';
 import Step2Business from './components/Step2Business';
 import Step3Terms from './components/Step3Terms';
 import Step4Thanks from './components/Step4Thanks';
-import { Send } from 'lucide-react';
 
 function App() {
   // Steps: 1=Referrer, 2=Business, 3=Terms, 4=Success
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<{ recordId: string } | null>(null);
+  const [taglineIndex, setTaglineIndex] = useState(0);
+
+  // Rotating taglines
+  const taglines = [
+    'Refer Business. Help Friends. Earn Rewards.',
+    'Zero Fees. Better Rates. Settled in 24 Hours.',
+    'Global Payments Without the Global Wait.'
+  ];
 
   // Setup React Hook Form with Zod
   const methods = useForm<ReferralFormData>({
@@ -42,9 +49,17 @@ function App() {
   useEffect(() => {
     const subscription = methods.watch((value) => {
       localStorage.setItem('karbon_referral_draft', JSON.stringify(value));
-    }) as any;
+    });
     return () => subscription.unsubscribe();
-  }, [methods.watch]);
+  }, [methods]);
+
+  // Rotate taglines every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTaglineIndex((prevIndex) => (prevIndex + 1) % taglines.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [taglines.length]);
 
   // --- Navigation Handlers ---
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 4));
@@ -77,9 +92,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10" />
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      {/* Marketing Banner - Clean and Professional */}
+      <div className="w-full h-[40px] bg-[#1B56FD] flex items-center justify-center">
+        <p className="text-sm font-medium text-white tracking-wide transition-opacity duration-500">
+          {taglines[taglineIndex]}
+        </p>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -93,7 +112,7 @@ function App() {
         )}
 
         {/* Form Container */}
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-slate-100 mt-8">
+        <div className="bg-white rounded-xl overflow-hidden border border-slate-200 mt-8">
           <div className="p-6 md:p-10">
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -106,7 +125,7 @@ function App() {
                 {currentStep === 3 && (
                   <Step3Terms 
                     onBack={prevStep} 
-                    onNext={() => {}} // Handled by internal submit
+                    onNext={() => {}} 
                     isSubmitting={isSubmitting}
                     onSubmit={methods.handleSubmit(onSubmit)}
                   />
@@ -126,7 +145,10 @@ function App() {
           {currentStep < 4 && (
              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-center">
                 <p className="text-xs text-slate-500">
-                  Need help? Contact our <a href="#" className="text-karbon-600 hover:underline font-medium">Partnership Team</a>.
+                  Need help? Contact us at{' '}
+                  <a href="mailto:sales@karboncard.com" className="text-[#1B56FD] hover:underline font-medium">
+                    sales@karboncard.com
+                  </a>
                 </p>
              </div>
           )}

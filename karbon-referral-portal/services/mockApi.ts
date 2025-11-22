@@ -1,27 +1,21 @@
 import { ReferralFormData } from '../types';
 
-export interface SubmissionResponse {
-  success: boolean;
-  recordId: string;
-  submittedAt: string;
-}
+export const submitReferral = async (data: ReferralFormData) => {
+  // Add +91 prefix to phone numbers before sending to actual backend
+  const formattedData = {
+    ...data,
+    referrerPhone: `+91${data.referrerPhone}`,
+    referredPhone: `+91${data.referredPhone}`,
+  };
 
-/**
- * Simulates the Airtable submission process described in the PRD.
- * In a real app, this would be a POST request to /api/referral/submit
- */
-export const submitReferral = async (data: ReferralFormData): Promise<SubmissionResponse> => {
-  return new Promise((resolve) => {
+  // Simulate API call
+  return new Promise<{ success: boolean; recordId: string }>((resolve) => {
     setTimeout(() => {
-      // Simulate a successful submission with a unique ID
-      const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      
+      console.log('Submitting referral with formatted data:', formattedData);
       resolve({
         success: true,
-        recordId: `REF-${dateStr}-${randomId}`,
-        submittedAt: new Date().toISOString(),
+        recordId: `REF-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
       });
-    }, 1500); // 1.5s simulated network delay
+    }, 1500);
   });
 };

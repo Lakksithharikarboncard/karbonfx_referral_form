@@ -26,17 +26,26 @@
               }
             },
             fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
+              sans: ['Poppins', 'system-ui', 'sans-serif'],
             },
           },
         },
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Updated to Poppins font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      body { font-family: 'Inter', sans-serif; background-color: #f4f7fa; }
+      body { 
+        font-family: 'Poppins', system-ui, sans-serif; 
+        background-color: #f4f7fa; 
+      }
+      * {
+        font-family: 'Poppins', system-ui, sans-serif;
+      }
     </style>
-  <script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
@@ -49,10 +58,10 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
-</head>
+    <link rel="stylesheet" href="/index.css">
+  </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

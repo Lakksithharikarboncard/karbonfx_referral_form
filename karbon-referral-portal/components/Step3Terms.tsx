@@ -1,95 +1,153 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { StepProps } from '../types';
-import { ArrowLeft, CheckCircle, ShieldCheck, FileText } from 'lucide-react';
+import { ArrowRight, ArrowLeft, FileText } from 'lucide-react';
 
-interface Step3Props extends StepProps {
+interface Step3TermsProps extends StepProps {
   isSubmitting: boolean;
   onSubmit: () => void;
 }
 
-const Step3Terms: React.FC<Step3Props> = ({ onBack, onSubmit, isSubmitting }) => {
-  const { register, formState: { errors, isValid }, watch } = useFormContext();
-  const acceptedTerms = watch('acceptedTerms');
+const Step3Terms: React.FC<Step3TermsProps> = ({ onBack, isSubmitting, onSubmit }) => {
+  const { register, formState: { errors } } = useFormContext();
 
   return (
     <div className="animate-fadeIn">
-       <div className="mb-6 border-b border-slate-200 pb-4">
+      {/* Header Section */}
+      <div className="mb-6 border-b border-slate-200 pb-4">
         <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <ShieldCheck className="w-6 h-6 text-karbon-600" />
-          Terms & Conditions
+          <FileText className="w-6 h-6 text-[#1B56FD]" aria-hidden="true" />
+          Referral Program - Terms & Conditions
         </h2>
-        <p className="text-slate-500 mt-1">Please review and accept the referral program terms.</p>
+        <p className="text-slate-500 mt-1">
+          Please review and accept the terms below to complete your referral submission.
+        </p>
       </div>
 
-      <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-6">
-        <div className="h-64 overflow-y-auto pr-2 text-sm text-slate-600 space-y-4 custom-scrollbar">
-          <h3 className="font-bold text-slate-800">KARBON REFERRAL PROGRAM TERMS AND CONDITIONS</h3>
-          
-          <p><strong>1. DEFINITION</strong><br/>The Karbon Referral Program ("Program") is designed to reward customers and partners who refer new businesses to Karbon's payment platform.</p>
+      {/* Terms Content - Scrollable */}
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-6 max-h-96 overflow-y-auto">
+        <div className="prose prose-sm max-w-none text-slate-700 space-y-4">
+          <p className="text-sm">By submitting this referral form, you agree to the following terms:</p>
 
-          <p><strong>2. ELIGIBILITY</strong><br/>Only individuals authorized to represent a business may submit referrals. Referrers must be existing Karbon customers or authorized partners. Referred businesses must not currently have a Karbon account.</p>
+          {/* Section 1 */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-2">1. Eligibility</h3>
+            <ul className="space-y-1 list-disc list-inside text-sm ml-2">
+              <li>Only existing Karbon customers can participate.</li>
+              <li>You refer someone by submitting their details through this form.</li>
+              <li>The referred person ("Referee") must register and complete their first transaction with us.</li>
+            </ul>
+          </div>
 
-          <p><strong>3. REWARD STRUCTURE</strong><br/>Commission structure will be communicated separately upon approval. Payment terms are Net 30 days after the referred business successfully onboards and processes their first transaction.</p>
+          {/* Section 2 */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-2">2. Reward Terms</h3>
+            <ul className="space-y-1 list-disc list-inside text-sm ml-2">
+              <li>First transaction means a completed FX transaction.</li>
+              <li>Vouchers will be issued within 30 days of transaction completion.</li>
+              <li>Vouchers are subject to the issuer's terms and expiry dates.</li>
+              <li>We reserve the right to verify all referrals and disqualify fraudulent/duplicate entries.</li>
+            </ul>
+          </div>
 
-          <p><strong>4. CONFIDENTIALITY</strong><br/>Referrers agree to maintain confidentiality of Karbon business terms, pricing, and any non-public information acquired during the referral process.</p>
+          {/* Section 3 */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-2">3. Your Responsibilities</h3>
+            <p className="text-sm mb-2">You confirm that:</p>
+            <ul className="space-y-1 list-disc list-inside text-sm ml-2">
+              <li>The Referee has been informed about this referral and consents to being contacted by us.</li>
+              <li>All information provided (yours and the Referee's) is accurate.</li>
+              <li>You will not spam, misuse, or engage in fraudulent referral activities.</li>
+            </ul>
+          </div>
 
-          <p><strong>5. LIMITATION OF LIABILITY</strong><br/>Karbon is not liable for referral disputes, commission disagreements, or compliance issues arising from the referred business's activities.</p>
+          {/* Section 4 */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-2">4. Data & Privacy</h3>
+            <div className="space-y-2 text-sm">
+              <p className="font-semibold text-slate-800">Your email, and phone number to track referrals and issue rewards.</p>
+              <div>
+                <p className="font-semibold text-slate-800">Referee's email, phone number, company name, and transaction intent to:</p>
+                <ul className="space-y-1 list-disc list-inside ml-2 mt-1">
+                  <li>Contact them about our services</li>
+                  <li>Complete onboarding</li>
+                  <li>Issue referral rewards</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800">Sharing:</p>
+                <p className="ml-2">We may share relevant information with our licensed FX partners and service providers strictly for onboarding, transaction processing, KYC compliance, and reward distribution.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800">Your Rights:</p>
+                <p className="ml-2">
+                  You or the Referee may withdraw consent or request data deletion by emailing{' '}
+                  <a href="mailto:sales@karboncard.com" className="text-[#1B56FD] hover:underline">
+                    sales@karboncard.com
+                  </a>.
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <p><strong>6. DATA PRIVACY</strong><br/>By submitting this form, you acknowledge that you have obtained necessary consent from the referred party to share their contact information with Karbon for business purposes.</p>
-          
-          <p><strong>7. MODIFICATION</strong><br/>Karbon reserves the right to modify or terminate this Program with 30 days' notice to all active referrers.</p>
-          
-          <p className="text-xs text-slate-400 italic">Last Updated: November 22, 2025</p>
+          {/* Section 5 */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-2">5. Program Changes</h3>
+            <p className="text-sm">
+              We may modify, suspend, or terminate this program at any time with reasonable notice. Pending rewards will be honored for qualified referrals made before termination.
+            </p>
+          </div>
+
+          {/* Section 6 */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-2">6. General</h3>
+            <ul className="space-y-1 list-disc list-inside text-sm ml-2">
+              <li>Our decisions on eligibility and rewards are final.</li>
+              <li>These terms are governed by Indian law, subject to courts in Bengaluru.</li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-start mb-8">
-        <div className="flex items-center h-5">
+      {/* Acceptance Checkbox with Justified Text */}
+      <div className="mb-6">
+        <label className="flex items-start gap-3 cursor-pointer">
           <input
-            id="acceptedTerms"
             type="checkbox"
+            className={`mt-1 w-4 h-4 rounded border text-[#1B56FD] focus:ring-[#1B56FD] ${
+              errors.acceptedTerms ? 'border-red-500' : 'border-slate-300'
+            }`}
             {...register('acceptedTerms')}
-            className="focus:ring-karbon-500 h-5 w-5 text-karbon-600 border-gray-300 rounded"
           />
-        </div>
-        <div className="ml-3 text-sm">
-          <label htmlFor="acceptedTerms" className="font-medium text-slate-700">
-            I have read and agree to the terms and conditions
-          </label>
-          {errors.acceptedTerms && (
-            <p className="text-red-600 mt-1">{errors.acceptedTerms.message as string}</p>
-          )}
-        </div>
+          <span className="text-sm text-slate-700 text-justify leading-relaxed">
+            I confirm that I have read and agree to these Terms & Conditions, that the Referee is aware of this referral and consents to being contacted by Karbon, and that I consent to Karbon processing and sharing my personal data as described above.
+          </span>
+        </label>
+        {errors.acceptedTerms && (
+          <p className="mt-2 ml-7 text-sm text-red-600">{errors.acceptedTerms.message as string}</p>
+        )}
       </div>
 
-      <div className="flex justify-between items-center">
+      {/* Action Buttons - Uniform sizing */}
+      <div className="mt-8 flex justify-between">
         <button
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="inline-flex items-center px-4 py-2 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-karbon-500 disabled:opacity-50"
+          className="inline-flex items-center justify-center min-w-[140px] px-6 py-2.5 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B56FD] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <ArrowLeft className="mr-2 -ml-1 h-5 w-5" />
+          <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
           Back
         </button>
-
         <button
           type="button"
           onClick={onSubmit}
-          disabled={!acceptedTerms || isSubmitting}
-          className={`
-            inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white
-            transition-all duration-200
-            ${!acceptedTerms || isSubmitting
-              ? 'bg-slate-400 cursor-not-allowed' 
-              : 'bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
-            }
-          `}
+          disabled={isSubmitting}
+          className="inline-flex items-center justify-center min-w-[140px] px-6 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-[#1B56FD] hover:bg-[#1547E5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B56FD] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -98,7 +156,7 @@ const Step3Terms: React.FC<Step3Props> = ({ onBack, onSubmit, isSubmitting }) =>
           ) : (
             <>
               Submit Referral
-              <CheckCircle className="ml-2 -mr-1 h-5 w-5" />
+              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
             </>
           )}
         </button>
