@@ -8,44 +8,45 @@ import Step1Referrer from './components/Step1Referrer';
 import Step2Business from './components/Step2Business';
 import Step3Terms from './components/Step3Terms';
 import Step4Thanks from './components/Step4Thanks';
+import { trackClarityEvent, setClarityTag, ClarityEvents } from '/workspaces/karbonfx_referral_form/karbon-referral-portal/src/utils/clarity.ts';
 
 function App() {
-  // Steps: 1=Referrer, 2=Business, 3=Terms, 4=Success
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<{ recordId: string } | null>(null);
-  const [taglineIndex, setTaglineIndex] = useState(0);
 
-  // Rotating taglines
-  const taglines = [
-    'Refer Business. Help Friends. Earn Rewards.',
-    'Zero Fees. Better Rates. Settled in 24 Hours.',
-    'Global Payments Without the Global Wait.'
-  ];
-
-  // Setup React Hook Form with Zod
   const methods = useForm<ReferralFormData>({
     resolver: zodResolver(referralSchema),
     defaultValues,
     mode: 'onChange' 
   });
 
-  // --- Persistence Logic (localStorage) ---
+  // Track initial page load
+  useEffect(() => {
+    trackClarityEvent(ClarityEvents.PAGE_LOAD);
+    setClarityTag('form_type', 'referral');
+  }, []);
+
+  // Track step changes
+  useEffect(() => {
+    trackClarityEvent(ClarityEvents.STEP_VIEWED, { step: currentStep });
+    setClarityTag('current_step', currentStep.toString());
+  }, [currentStep]);
+
+  // Persistence Logic
   useEffect(() => {
     const savedData = localStorage.getItem('karbon_referral_draft');
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         methods.reset(parsed);
+        trackClarityEvent('form_resumed_from_draft');
       } catch (e) {
         console.error("Failed to load draft", e);
       }
     }
-    // Run only once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Watch for changes to save draft
   useEffect(() => {
     const subscription = methods.watch((value) => {
       localStorage.setItem('karbon_referral_draft', JSON.stringify(value));
@@ -53,31 +54,42 @@ function App() {
     return () => subscription.unsubscribe();
   }, [methods]);
 
-  // Rotate taglines every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTaglineIndex((prevIndex) => (prevIndex + 1) % taglines.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [taglines.length]);
+  // Navigation Handlers with Tracking
+  const nextStep = () => {
+    trackClarityEvent(ClarityEvents.NEXT_CLICKED, { from_step: currentStep });
+    trackClarityEvent(ClarityEvents.STEP_COMPLETED, { step: currentStep });
+    setCurrentStep((prev) => Math.min(prev + 1, 4));
+  };
 
-  // --- Navigation Handlers ---
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 4));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const prevStep = () => {
+    trackClarityEvent(ClarityEvents.BACK_CLICKED, { from_step: currentStep });
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
 
-  // --- Submission Handler ---
+  // Submission Handler with Tracking
   const onSubmit = async (data: ReferralFormData) => {
+    trackClarityEvent(ClarityEvents.FORM_SUBMITTED);
     setIsSubmitting(true);
+    
     try {
       const response = await submitReferral(data);
+      
       if (response.success) {
+        trackClarityEvent(ClarityEvents.SUBMISSION_SUCCESS, {
+          referral_id: response.recordId,
+        });
+        trackClarityEvent(ClarityEvents.AIRTABLE_SUCCESS);
+        
         setSubmissionResult({ recordId: response.recordId });
-        // Clear local storage draft
         localStorage.removeItem('karbon_referral_draft');
-        nextStep(); // Move to Step 4
+        nextStep();
       }
     } catch (error) {
       console.error("Submission failed", error);
+      trackClarityEvent(ClarityEvents.SUBMISSION_FAILED, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      trackClarityEvent(ClarityEvents.AIRTABLE_ERROR);
       alert("Failed to submit referral. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -89,21 +101,21 @@ function App() {
     setSubmissionResult(null);
     setCurrentStep(1);
     localStorage.removeItem('karbon_referral_draft');
+    trackClarityEvent('form_reset');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Marketing Banner - Clean and Professional */}
+      {/* Marketing Banner */}
       <div className="w-full h-[40px] bg-[#1B56FD] flex items-center justify-center">
         <p className="text-sm font-medium text-white tracking-wide transition-opacity duration-500">
-          {taglines[taglineIndex]}
+          Refer Business. Help Friends. Earn Rewards.
         </p>
       </div>
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         
-        {/* Progress Stepper (Only show if not on success page) */}
         {currentStep < 4 && (
           <Stepper 
             currentStep={currentStep} 
@@ -111,7 +123,6 @@ function App() {
           />
         )}
 
-        {/* Form Container */}
         <div className="bg-white rounded-xl overflow-hidden border border-slate-200 mt-8">
           <div className="p-6 md:p-10">
             <FormProvider {...methods}>
@@ -141,7 +152,6 @@ function App() {
             </FormProvider>
           </div>
           
-          {/* Footer Support Link */}
           {currentStep < 4 && (
              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-center">
                 <p className="text-xs text-slate-500">

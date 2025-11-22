@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ReferralFormData } from '../types';
 import { CheckCircle, ExternalLink } from 'lucide-react';
+import { trackClarityEvent, identifyClarityUser, setClarityTag, ClarityEvents } from '../src/utils/clarity.ts';
 
 interface Step4ThanksProps {
   data: ReferralFormData;
@@ -9,8 +10,22 @@ interface Step4ThanksProps {
 }
 
 const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
-  // Confetti animation on mount
+  // Clarity tracking and confetti animation on mount
   useEffect(() => {
+    // Track thank you page view
+    trackClarityEvent(ClarityEvents.THANK_YOU_VIEWED, {
+      referral_id: recordId,
+      referrer_company: data.referrerCompany,
+      referred_company: data.referredCompanyName,
+    });
+    
+    // Identify user session by referral ID
+    identifyClarityUser(recordId);
+    
+    // Set custom tags for filtering in Clarity
+    setClarityTag('referral_id', recordId);
+    setClarityTag('submission_complete', 'true');
+    
     // Create confetti effect
     const duration = 3000; // 3 seconds
     const animationEnd = Date.now() + duration;
@@ -50,7 +65,7 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
     }, 50);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [recordId, data]);
 
   // Simple confetti creation function
   function createConfetti(options: any) {
@@ -115,7 +130,21 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
   }
 
   const handleReturnToDashboard = () => {
+    // Track dashboard button click
+    trackClarityEvent(ClarityEvents.RETURN_TO_DASHBOARD, {
+      referral_id: recordId,
+      destination: 'https://karbonfx.com/login',
+    });
+    
     window.location.href = 'https://karbonfx.com/login';
+  };
+
+  const handleContactTeam = () => {
+    // Track contact team click
+    trackClarityEvent('contact_team_clicked', {
+      referral_id: recordId,
+      source: 'thank_you_page',
+    });
   };
 
   return (
@@ -209,7 +238,11 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
       <div className="mt-8 pt-6 border-t border-slate-200 text-center">
         <p className="text-sm text-slate-500">
           Questions about your referral?{' '}
-          <a href="mailto:sales@karboncard.com" className="text-[#1B56FD] hover:underline font-medium">
+          <a 
+            href="mailto:sales@karboncard.com" 
+            className="text-[#1B56FD] hover:underline font-medium"
+            onClick={handleContactTeam}
+          >
             Contact our team
           </a>
         </p>

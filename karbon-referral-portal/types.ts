@@ -36,11 +36,19 @@ export const referralSchema = z.object({
   referredContactName: z.string().min(2, "Contact name is required").max(100),
   referredEmail: z.string().email("Invalid email"),
   referredPhone: z.string().regex(PHONE_REGEX, "Invalid phone number"),
+  
+  // FIXED: Removed .transform() to keep it as string
   transactionValue: z.string()
     .min(1, "Transaction value is required")
-    .transform((val) => parseFloat(val))
-    .refine((val) => !isNaN(val) && val >= 500, "Minimum value is $500")
-    .refine((val) => !isNaN(val) && val <= 100000, "Maximum value is $100,000"),
+    .refine((val) => {
+      const num = parseFloat(val);
+      return !isNaN(num) && num >= 500;
+    }, "Minimum value is $500")
+    .refine((val) => {
+      const num = parseFloat(val);
+      return !isNaN(num) && num <= 100000;
+    }, "Maximum value is $100,000"),
+  
   notificationStatus: z.nativeEnum(NotificationStatus, {
     errorMap: () => ({ message: "Please select an option" })
   }),
@@ -57,6 +65,7 @@ export const referralSchema = z.object({
 
 export type ReferralFormData = z.infer<typeof referralSchema>;
 
+// FIXED: Removed 'as any' type assertion
 export const defaultValues: Partial<ReferralFormData> = {
   referrerName: '',
   referrerEmail: '',
@@ -66,7 +75,7 @@ export const defaultValues: Partial<ReferralFormData> = {
   referredContactName: '',
   referredEmail: '',
   referredPhone: '',
-  transactionValue: '' as any,
+  transactionValue: '', // Now correctly typed as string
   acceptedTerms: false,
   notificationStatus: undefined,
   discoverySource: undefined,
