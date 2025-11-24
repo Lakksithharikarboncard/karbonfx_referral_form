@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ReferralFormData } from '../types';
 import { CheckCircle, ExternalLink } from 'lucide-react';
-import { trackClarityEvent, identifyClarityUser, setClarityTag, ClarityEvents } from '../utils/clarity.ts';
+import { trackClarityEvent, identifyClarityUser, setClarityTag, ClarityEvents } from '../utils/clarity';
 
 interface Step4ThanksProps {
   data: ReferralFormData;
@@ -26,14 +26,10 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
     setClarityTag('referral_id', recordId);
     setClarityTag('submission_complete', 'true');
     
-    // Create confetti effect
+    // Create confetti effect - falling from top
     const duration = 3000; // 3 seconds
     const animationEnd = Date.now() + duration;
-    const colors = ['#1B56FD', '#60A5FA', '#3B82F6', '#2563EB', '#1E40AF'];
-
-    function randomInRange(min: number, max: number) {
-      return Math.random() * (max - min) + min;
-    }
+    const colors = ['#1B56FD', '#60A5FA', '#3B82F6', '#2563EB', '#1E40AF', '#10B981'];
 
     const interval = setInterval(() => {
       const timeLeft = animationEnd - Date.now();
@@ -43,23 +39,12 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
         return;
       }
 
-      const particleCount = 3;
+      const particleCount = 5;
 
-      // Create confetti from left side
+      // Create confetti falling from top
       createConfetti({
         particleCount,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.6 },
-        colors,
-      });
-
-      // Create confetti from right side
-      createConfetti({
-        particleCount,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.6 },
+        origin: { x: Math.random(), y: 0 }, // Random horizontal position, top of screen
         colors,
       });
     }, 50);
@@ -67,7 +52,7 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
     return () => clearInterval(interval);
   }, [recordId, data]);
 
-  // Simple confetti creation function
+  // Improved confetti creation function - top-down falling
   function createConfetti(options: any) {
     const canvas = document.createElement('canvas');
     canvas.style.position = 'fixed';
@@ -91,12 +76,12 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
       particles.push({
         x: canvas.width * options.origin.x,
         y: canvas.height * options.origin.y,
-        angle: options.angle + (Math.random() - 0.5) * options.spread,
-        velocity: 3 + Math.random() * 3,
+        velocityX: (Math.random() - 0.5) * 2, // Horizontal drift
+        velocityY: Math.random() * 2 + 2, // Downward velocity
         color: options.colors[Math.floor(Math.random() * options.colors.length)],
-        size: 8 + Math.random() * 4,
-        decay: 0.95,
-        gravity: 0.3,
+        size: 8 + Math.random() * 6,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 10,
       });
     }
 
@@ -107,15 +92,23 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
       let stillActive = false;
 
       particles.forEach((p) => {
-        p.velocity *= p.decay;
-        p.y += p.gravity;
-        p.x += Math.cos((p.angle * Math.PI) / 180) * p.velocity;
-        p.y += Math.sin((p.angle * Math.PI) / 180) * p.velocity;
+        // Update position
+        p.x += p.velocityX;
+        p.y += p.velocityY;
+        p.velocityY += 0.1; // Gravity
+        p.rotation += p.rotationSpeed;
 
-        if (p.y < canvas.height && p.velocity > 0.1) {
+        // Check if particle is still on screen
+        if (p.y < canvas.height + 20 && p.x > -20 && p.x < canvas.width + 20) {
           stillActive = true;
+          
+          // Draw rotating rectangle (confetti piece)
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
           ctx.fillStyle = p.color;
-          ctx.fillRect(p.x, p.y, p.size, p.size);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
         }
       });
 
@@ -217,7 +210,7 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 mt-0.5">•</span>
-            <span>Your ₹2,500 Amazon voucher will be issued within 30 days of transaction completion</span>
+            <span>Your ₹2,500 voucher will be issued within 30 days of transaction completion</span>
           </li>
         </ul>
       </div>
@@ -234,16 +227,16 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
         </button>
       </div>
 
-      {/* Support Footer */}
+      {/* Support Footer - Matching other steps */}
       <div className="mt-8 pt-6 border-t border-slate-200 text-center">
         <p className="text-sm text-slate-500">
-          Questions about your referral?{' '}
+          Need help? Contact us at{' '}
           <a 
             href="mailto:sales@karboncard.com" 
             className="text-[#1B56FD] hover:underline font-medium"
             onClick={handleContactTeam}
           >
-            Contact our team
+            sales@karboncard.com
           </a>
         </p>
       </div>
