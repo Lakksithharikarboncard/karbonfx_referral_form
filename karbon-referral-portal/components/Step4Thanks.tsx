@@ -217,7 +217,7 @@ const Step4Thanks: React.FC<Step4ThanksProps> = ({ data, recordId }) => {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 mt-0.5">•</span>
-            <span>Your ₹2,500 voucher will be issued within 30 days of transaction completion</span>
+            <span>Your ₹2,500 Amazon voucher will be issued within 30 days of transaction completion</span>
           </li>
         </ul>
       </div>
